@@ -119,6 +119,7 @@ reload_service() {
 }
 
 stop_service() {
+        wifi down
         stop
 }
 
