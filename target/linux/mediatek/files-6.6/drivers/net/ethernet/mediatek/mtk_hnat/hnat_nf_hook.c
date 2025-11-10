@@ -350,7 +350,8 @@ void ppd_dev_setting(void)
                         	if (dev->flags & IFF_UP) {
                               		if (netif_carrier_ok(dev)){
 					ppd_dev = __dev_get_by_name(&init_net, dev->name);
-                                	break;
+                                	hnat_priv->g_ppdev = __dev_get_by_name(&init_net, dev->name);
+					break;
 					}
                                 }
                         }
