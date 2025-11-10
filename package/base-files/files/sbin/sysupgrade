@@ -403,7 +403,7 @@ fi
 
 install_bin /sbin/upgraded
 v "Commencing upgrade. Closing all shell sessions."
-
+wifi down
 if [ -n "$FAILSAFE" ]; then
 	printf '%s\x00%s\x00%s' "$RAM_ROOT" "$IMAGE" "$COMMAND" >/tmp/sysupgrade
 	lock -u /tmp/.failsafe
