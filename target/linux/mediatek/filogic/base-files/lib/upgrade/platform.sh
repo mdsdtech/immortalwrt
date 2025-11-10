@@ -140,6 +140,7 @@ platform_do_upgrade() {
 	smartrg,sdg-8734)
 		CI_KERNPART="kernel"
 		CI_ROOTPART="rootfs"
+		wifi down
 		emmc_do_upgrade "$1"
 		;;
 	asus,rt-ax52|\
