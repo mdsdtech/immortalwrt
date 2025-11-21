@@ -341,22 +341,27 @@ static void gmac_ppe_fwd_enable(struct net_device *dev)
 
 void ppd_dev_setting(void)
 {
-	struct net_device *br_dev;
-	br_dev = __dev_get_by_name(&init_net, "br-lan");
-		if (br_dev) {
-                        struct net_device *dev;
-                        struct list_head *pos;
-                	netdev_for_each_lower_dev(br_dev, dev, pos) {
-                        	if (dev->flags & IFF_UP) {
-                              		if (netif_carrier_ok(dev)){
-					ppd_dev = __dev_get_by_name(&init_net, dev->name);
-                                	hnat_priv->g_ppdev = __dev_get_by_name(&init_net, dev->name);
-					break;
-					}
+        struct net_device *br_dev,*hnat_dev;
+        br_dev = __dev_get_by_name(&init_net, "br-lan");
+        hnat_dev = __dev_get_by_name(&init_net, "hnat");
+        if (br_dev) {
+                struct net_device *dev;
+                struct list_head *pos;
+                netdev_for_each_lower_dev(br_dev, dev, pos) {
+                        if (dev->flags & IFF_UP) {
+                            if (netif_carrier_ok(dev)){
+                                ppd_dev = __dev_get_by_name(&init_net, dev->name);
+                                hnat_priv->g_ppdev = __dev_get_by_name(&init_net, dev->name);
+                                break;
+                                        }
                                 }
                         }
                 }
-	printk("\nrx now ppd dev is %s\n",hnat_priv->g_ppdev->name);
+        if (hnat_dev && hnat_dev->flags & IFF_UP){
+                ppd_dev = __dev_get_by_name(&init_net, "hnat");
+                hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "hnat");
+        }
+        printk("\nrx now ppd dev is %s\n",hnat_priv->g_ppdev->name);
         printk("\ntx now ppd dev is %s\n",ppd_dev->name);
 }
 
