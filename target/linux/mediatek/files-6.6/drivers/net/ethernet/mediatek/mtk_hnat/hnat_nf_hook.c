@@ -357,7 +357,8 @@ void ppd_dev_setting(void)
                                 }
                         }
                 }
-        if (hnat_dev && hnat_dev->flags & IFF_UP){
+        if (0) {
+	// if (hnat_dev && hnat_dev->flags & IFF_UP){
                 ppd_dev = __dev_get_by_name(&init_net, "hnat");
                 hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "hnat");
         }
