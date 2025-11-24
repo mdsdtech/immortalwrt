@@ -78,6 +78,11 @@ mtwifi_defs.vif_cfgs_idx = {
     ["RADIUS_Key"] = "",
 }
 
+mtwifi_defs.vif_mac = {
+    ["MacAddress"] = "",
+    -- ["MldAddr"] = "",
+}
+
 mtwifi_defs.vif_acl = {
     ["AccessPolicy"] = "0",
     ["AccessControlList"] = "",
