@@ -564,6 +564,15 @@ unsigned int do_hnat_ext_to_ge(struct sk_buff *skb, const struct net_device *in,
 			if (!skb)
 				return -1;
 		}
+
+		if (unlikely(skb_is_gso(skb) || skb_shinfo(skb)->frag_list))
+                        return -1;
+
+        if (unlikely(skb_headroom(skb) < (FOE_INFO_LEN + ETH_HLEN))) {
+        	if(unlikely(skb_cow_head(skb, FOE_INFO_LEN + ETH_HLEN)))
+            	return -1;
+        }
+
 		
 		/*set where we come from*/
 		if (unlikely(skb_vlan_tag_present(skb))){
