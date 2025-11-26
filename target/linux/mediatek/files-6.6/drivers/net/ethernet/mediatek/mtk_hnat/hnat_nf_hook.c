@@ -110,6 +110,8 @@ static inline struct net_device *get_dev_from_index(int index)
 			break;
 		}
 	}
+		if (index == 1234)
+			dev = ppd_dev;
 	return dev;
 }
 
@@ -341,9 +343,8 @@ static void gmac_ppe_fwd_enable(struct net_device *dev)
 
 void ppd_dev_setting(void)
 {
-        struct net_device *br_dev,*hnat_dev;
-        br_dev = __dev_get_by_name(&init_net, "br-lan");
-        hnat_dev = __dev_get_by_name(&init_net, "hnat");
+	struct net_device *br_dev;
+	br_dev = __dev_get_by_name(&init_net, "br-lan");
         if (br_dev) {
                 struct net_device *dev;
                 struct list_head *pos;
@@ -356,12 +357,7 @@ void ppd_dev_setting(void)
                                         }
                                 }
                         }
-                }
-        if (0) {
-	// if (hnat_dev && hnat_dev->flags & IFF_UP){
-                ppd_dev = __dev_get_by_name(&init_net, "hnat");
-                hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "hnat");
-        }
+                } 
         printk("\nrx now ppd dev is %s\n",hnat_priv->g_ppdev->name);
         printk("\ntx now ppd dev is %s\n",ppd_dev->name);
 }
@@ -757,6 +753,8 @@ static inline void hnat_set_iif(const struct nf_hook_state *state,
 {
 	if (IS_WHNAT(state->in) && FROM_WED(skb)) {
 		return;
+	} else if (IS_WHNAT(state->in)) {
+                skb_hnat_iface(skb) = FOE_MAGIC_GE_LAN;
 	} else if (IS_LAN(state->in)) {
 		skb_hnat_iface(skb) = FOE_MAGIC_GE_LAN;
 	} else if (IS_LAN2(state->in)) {
@@ -926,6 +924,43 @@ static unsigned int is_ppe_support_type(struct sk_buff *skb)
 	return 0;
 }
 
+static unsigned int do_hnat_cpu_to_ge(struct sk_buff *skb)
+{
+	if (unlikely(skb_shinfo(skb)->frag_list))
+                return -1;
+        if (unlikely(skb_headroom(skb) < (FOE_INFO_LEN + ETH_HLEN))) {
+                if(unlikely(skb_cow(skb, FOE_INFO_LEN + ETH_HLEN)))
+                return -1;
+        }
+
+	skb_hnat_alg(skb) = 0;
+	skb_hnat_magic_tag(skb) = HNAT_MAGIC_TAG;
+	skb_hnat_filled(skb) = 0;
+
+	if (unlikely(!is_ppe_support_type(skb))) {
+                skb_hnat_alg(skb) = 1;
+                return -1;
+        }
+        if (hnat_priv->g_ppdev && hnat_priv->g_ppdev->flags & IFF_UP) {
+                u16 vlan_id = 0;
+                skb_set_network_header(skb, 0);
+                skb_push(skb, ETH_HLEN);
+		set_to_ppe(skb);
+                vlan_id = skb_vlan_tag_get_id(skb);
+                if (unlikely(vlan_id)) {
+                        skb = vlan_insert_tag(skb, skb->vlan_proto, skb->vlan_tci);
+                        if (!skb)
+                                return -1;
+                }
+
+                /*set where we come from */
+                __vlan_hwaccel_put_tag(skb, htons(ETH_P_8021Q), VLAN_CFI_MASK | (1234 & VLAN_VID_MASK));
+                skb->dev = hnat_priv->g_ppdev;
+                dev_queue_xmit(skb);
+     		return 0;
+        }
+	return -1;
+}
 
 static void mtk_hnat_nf_update(struct sk_buff *skb)
 {
@@ -999,7 +1034,7 @@ mtk_hnat_ipv6_nf_pre_routing(void *priv, struct sk_buff *skb,
 	if (!skb)
 		goto drop;
 	if (!IS_WHNAT(state->in) && IS_EXT(state->in)) {
-		if (unlikely(skb_is_gso(skb) || skb_shinfo(skb)->frag_list))
+		if (unlikely(skb_shinfo(skb)->frag_list))
         	return NF_ACCEPT;
         if (unlikely(skb_headroom(skb) < (FOE_INFO_LEN + ETH_HLEN))) {
         	if(unlikely(skb_cow(skb, FOE_INFO_LEN + ETH_HLEN)))
@@ -1077,7 +1112,7 @@ mtk_hnat_ipv4_nf_pre_routing(void *priv, struct sk_buff *skb,
 		goto drop;
 		
 	if (!IS_WHNAT(state->in) && IS_EXT(state->in)) {
-		if (unlikely(skb_is_gso(skb) || skb_shinfo(skb)->frag_list))
+		if (unlikely(skb_shinfo(skb)->frag_list))
         	return NF_ACCEPT;
         if (unlikely(skb_headroom(skb) < (FOE_INFO_LEN + ETH_HLEN))) {
         	if(unlikely(skb_cow(skb, FOE_INFO_LEN + ETH_HLEN)))
@@ -1157,7 +1192,7 @@ mtk_hnat_br_nf_local_in(void *priv, struct sk_buff *skb,
 		goto drop;
 	
 	if (!IS_WHNAT(state->in) && IS_EXT(state->in)) {
-		if (unlikely(skb_is_gso(skb) || skb_shinfo(skb)->frag_list))
+		if (unlikely(skb_shinfo(skb)->frag_list))
         	return NF_ACCEPT;
         if (unlikely(skb_headroom(skb) < (FOE_INFO_LEN + ETH_HLEN))) {
         	if(unlikely(skb_cow(skb, FOE_INFO_LEN + ETH_HLEN)))
@@ -3218,6 +3253,11 @@ mtk_hnat_br_nf_local_out(void *priv, struct sk_buff *skb,
 {
 	if (!skb)
 		goto drop;
+	
+	if ((!strncmp(state->out->name, "ra",2)&& !is_from_extge(skb))){
+                if (!do_hnat_cpu_to_ge(skb))
+                        return NF_STOLEN; 
+        }
 
 	if (!is_magic_tag_valid(skb))
 		return NF_ACCEPT;
