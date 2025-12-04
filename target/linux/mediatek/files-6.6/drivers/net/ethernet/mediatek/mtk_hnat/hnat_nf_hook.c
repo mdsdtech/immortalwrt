@@ -379,6 +379,13 @@ void ppd_dev_setting(void)
                 hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth0");
                 }
 		}
+	br_dev = __dev_get_by_name(&init_net, "hnat");
+        if (br_dev){
+        if (br_dev->flags & IFF_UP){
+		if (netif_carrier_ok(br_dev))
+                hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "hnat");
+                }
+		}
 	pr_info("%s : now rx dev: %s, tx dev: %s\n", 
 		__func__, hnat_priv->g_ppdev->name, ppd_dev->name);
 }
