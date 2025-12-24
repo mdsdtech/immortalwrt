@@ -14,7 +14,7 @@ msgstr ""
 msgid "Base Setting"
 msgstr "基本设置"
 
-msgid "Hyper Modem Server"
+msgid "Hyper Modem"
 msgstr "超级移动网络拨号服务"
 
 msgid "Modem Server For OpenWrt"
