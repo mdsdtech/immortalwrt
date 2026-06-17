@@ -163,6 +163,10 @@ mediatek_setup_interfaces()
 	xiaomi,redmi-router-ax6000-ubootmod)
 		ucidef_set_interfaces_lan_wan "lan2 lan3 lan4" wan
 		;;
+	panellan,zx7981pd|\
+	panellan,zx7981pde)
+		ucidef_set_interfaces_lan_wan "lan1 lan2" wan
+		;;
 	*)
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" wan
 		;;
@@ -226,6 +230,12 @@ mediatek_setup_macs()
 		;;
 	yuncore,ax835)
 		label_mac=$(mtd_get_mac_binary "Factory" 0x4)
+		;;
+	panellan,zx7981pd |\
+	panellan,zx7981pde)
+		label_mac=$(mtd_get_mac_binary factory 0x04)
+		wan_mac=$label_mac
+		lan_mac=$(macaddr_add "$label_mac" 1)
 		;;
 	esac
 

@@ -136,6 +136,8 @@ platform_do_upgrade() {
 		CI_KERNPART="linux"
 		nand_do_upgrade "$1"
 		;;
+	panellan,zx7981pd|\
+	panellan,zx7981pde|\
 	cudy,wr3000h-v1|\
 	cudy,wr3000p-v1)
 		CI_UBIPART="ubi"

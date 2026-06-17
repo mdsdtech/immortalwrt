@@ -214,6 +214,12 @@ zyxel,ex5601-t0-ubootmod)
 	ucidef_set_led_netdev "wifi-24g" "WIFI-2.4G" "green:wifi24g" "phy0-ap0" "link tx rx"
 	ucidef_set_led_netdev "wifi-5g" "WIFI-5G" "green:wifi5g" "phy1-ap0" "link tx rx"
 	;;
+"panellan,zx7981pd" | \
+"panellan,zx7981pde")
+    ucidef_set_led_netdev "wan" "wan" "lede:blue:wan" "wan"
+    ucidef_set_led_netdev "lan1" "lan1" "lede:blue:lan1" "lan1"
+    ucidef_set_led_netdev "lan2" "lan2" "lede:blue:lan2" "lan2"
+    ;;
 esac
 
 board_config_flush
