@@ -12,7 +12,7 @@
 	compatible = "panellan,zx7981pde", "mediatek,mt7981";
 
 	aliases {
-		label-mac-device = &wan;
+		ethernet0 = &gmac0;
 		serial0 = &uart0;
 	};
 
