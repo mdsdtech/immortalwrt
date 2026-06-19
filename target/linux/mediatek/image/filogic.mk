@@ -1877,6 +1877,38 @@ define Device/openwrt_one
 endef
 TARGET_DEVICES += openwrt_one
 
+define Device/panellan_zx7981pd
+  DEVICE_VENDOR := PanelLan
+  DEVICE_MODEL := ZX7981PD
+  DEVICE_DTS := mt7981b-panellan-zx7981pd
+  DEVICE_DTS_DIR := ../dts
+  SUPPORTED_DEVICES += panellan,zx7981pd
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware kmod-usb3
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGE_SIZE := 65536k
+  KERNEL_IN_UBI := 1
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+endef
+TARGET_DEVICES += panellan_zx7981pd
+
+define Device/panellan_zx7981pde
+  DEVICE_VENDOR := PanelLan
+  DEVICE_MODEL := ZX7981PDE
+  DEVICE_DTS := mt7981b-panellan-zx7981pde
+  DEVICE_DTS_DIR := ../dts
+  SUPPORTED_DEVICES += panellan,zx7981pde
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware kmod-usb3
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGE_SIZE := 65536k
+  KERNEL_IN_UBI := 1
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+endef
+TARGET_DEVICES += panellan_zx7981pde
+
 define Device/qihoo_360t7
   DEVICE_VENDOR := Qihoo
   DEVICE_MODEL := 360T7
@@ -2537,35 +2569,3 @@ define Device/zyxel_nwa50ax-pro
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 endef
 TARGET_DEVICES += zyxel_nwa50ax-pro
-
-define Device/panellan_zx7981pd
-  DEVICE_VENDOR := PanelLan
-  DEVICE_MODEL := ZX7981PD
-  DEVICE_DTS := mt7981b-panellan-zx7981pd
-  DEVICE_DTS_DIR := ../dts
-  SUPPORTED_DEVICES += panellan,zx7981pd
-  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware kmod-usb3
-  UBINIZE_OPTS := -E 5
-  BLOCKSIZE := 128k
-  PAGESIZE := 2048
-  IMAGE_SIZE := 65536k
-  KERNEL_IN_UBI := 1
-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
-endef
-TARGET_DEVICES += panellan_zx7981pd
-
-define Device/panellan_zx7981pde
-  DEVICE_VENDOR := PanelLan
-  DEVICE_MODEL := ZX7981PDE
-  DEVICE_DTS := mt7981b-panellan-zx7981pde
-  DEVICE_DTS_DIR := ../dts
-  SUPPORTED_DEVICES += panellan,zx7981pde
-  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware kmod-usb3
-  UBINIZE_OPTS := -E 5
-  BLOCKSIZE := 128k
-  PAGESIZE := 2048
-  IMAGE_SIZE := 65536k
-  KERNEL_IN_UBI := 1
-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
-endef
-TARGET_DEVICES += panellan_zx7981pde
