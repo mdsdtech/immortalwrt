@@ -233,7 +233,7 @@ mediatek_setup_macs()
 		;;
 	panellan,zx7981pd |\
 	panellan,zx7981pde)
-		label_mac=$(mtd_get_mac_binary wtinfo 10)
+		label_mac=$(mtd_get_mac_binary Factory 4)
 		wan_mac=$label_mac
 		lan_mac=$(macaddr_add "$label_mac" 1)
 		;;

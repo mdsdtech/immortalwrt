@@ -217,8 +217,8 @@ zyxel,ex5601-t0-ubootmod)
 "panellan,zx7981pd" | \
 "panellan,zx7981pde")
 	ucidef_set_led_default "power" "POWER" "wt:power:blue" "1"
-	ucidef_set_led_netdev "wlan2g" "WLAN2G" "wt:wifi:blue" "ra0" "link tx rx"
-	ucidef_set_led_netdev "wlan5g" "WLAN5G" "wt:5g:blue" "rai0" "link tx rx"
+	ucidef_set_led_netdev "wlan2g" "WLAN2G" "wt:wifi:blue" "phy0-ap0" "link tx rx"
+	ucidef_set_led_netdev "wlan5g" "WLAN5G" "wt:wifi:blue" "phy1-ap0" "link tx rx"
     ;;
 esac
 

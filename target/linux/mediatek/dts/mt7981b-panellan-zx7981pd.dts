@@ -3,13 +3,16 @@
 /dts-v1/;
 
 #include "mt7981.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/leds/common.h>
 
 / {
-	model = "PanelLan ZX7981PDE";
-	compatible = "panellan,zx7981pde", "mediatek,mt7981";
+	model = "PanelLan ZX7981PD";
+	compatible = "panellan,zx7981pd", "mediatek,mt7981";
 
 	aliases {
-		label-mac-device = &wan;
+		ethernet0 = &gmac0;
 		serial0 = &uart0;
 	};
 
@@ -17,108 +20,95 @@
 		stdout-path = "serial0:115200n8";
 	};
 
+	memory@40000000 {
+		reg = <0 0x40000000 0 0x20000000>;
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		
+		button-reset {
+			label = "reset";
+			linux,code = <KEY_RESTART>;
+			gpios = <&pio 1 GPIO_ACTIVE_LOW>;
+		};
+
+		button-wps {
+			label = "wps";
+			linux,code = <KEY_WPS_BUTTON>;
+			gpios = <&pio 0 GPIO_ACTIVE_LOW>;
+		};
+	};
+
 	gpio-leds {
 		compatible = "gpio-leds";
 
-		mesh {
-			label = "lede:blue:mesh";
-			gpios = <&pio 11 0>;
-			linux,default-trigger = "none";
+		led-0 {
+			label = "wt:4g:green";
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&pio 11 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 
-		5gyellow {
-			label = "lede:blue:5gyellow";
-			gpios = <&pio 13 0>;
-			linux,default-trigger = "none";
+		led-1 {
+			label = "wt:5g:yellow";
+			color = <LED_COLOR_ID_YELLOW>;
+			gpios = <&pio 13 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 
-		5gblue {
-			label = "lede:blue:5gblue";
-			gpios = <&pio 9 0>;
-			linux,default-trigger = "none";
+		led-2 {
+			label = "wt:5g:blue";
+			color = <LED_COLOR_ID_BLUE>;
+			gpios = <&pio 9 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 
-		wifi {
-			label = "lede:blue:wifi";
-			gpios = <&pio 4 0>;
-			linux,default-trigger = "none";
+		led-3 {
+			label = "wt:wifi:blue";
+			color = <LED_COLOR_ID_BLUE>;
+			gpios = <&pio 4 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 
-		blue {
-			label = "lede:blue:blue";
-			gpios = <&pio 5 0>;
-			linux,default-trigger = "none";
-			default-state = "off";
-		};
-
-		red {
-			label = "lede:blue:red";
-			gpios = <&pio 6 0>;
-			linux,default-trigger = "none";
+		led-4 {
+			label = "wt:power:blue";
+			color = <LED_COLOR_ID_BLUE>;
+			function = LED_FUNCTION_POWER;
+			gpios = <&pio 5 GPIO_ACTIVE_HIGH>;
 			default-state = "on";
 		};
 
-		4gblue {
-			label = "lede:blue:4gblue";
-			gpios = <&pio 12 0>;
-			linux,default-trigger = "none";
+		led-5 {
+			label = "wt:4g:blue";
+			color = <LED_COLOR_ID_BLUE>;
+			gpios = <&pio 12 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 
-		4gyellow {
-			label = "lede:blue:4gyellow";
-			gpios = <&pio 10 0>;
-			linux,default-trigger = "none";
+		led-6 {
+			label = "wt:4g:yellow";
+			color = <LED_COLOR_ID_YELLOW>;
+			gpios = <&pio 10 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 	};
 
 	gpio-export {
 		compatible = "gpio-export";
-		5gpower {
-			gpio-export,name = "5gpower";
-			gpio-export,output = <0>; // OUT_INIT_LOW
-			gpios = <&pio 2 0>;    // GPIO 2, ACTIVE_LOW
+
+		m2_slot {
+			gpio-export,name = "m2_slot";
+			gpio-export,output = <0>;
+			gpios = <&pio 2 0>;
 		};
 
-		5gsim {
-			gpio-export,name = "5gsim";
-			gpio-export,output = <1>; // OUT_INIT_LOW
-			gpios = <&pio 25 0>;    // GPIO 15, ACTIVE_LOW
-		};
-
-	};
-
-	gpio-keys {
-		compatible = "gpio-keys";
-		#address-cells = <1>;
-		#size-cells = <0>;
-		poll-interval = <20>;
-
-		reset {
-			label = "reset";
-			gpios = <&pio 1 1>;
-			linux,code = <KEY_RESTART>;
-		};
-
-		wps {
-			label = "wps";
-			gpios = <&pio 0 1>;
-			linux,code = <KEY_WPS_BUTTON>;
+		sim-card_slot {
+			gpio-export,name = "sim-card_slot";
+			gpio-export,output = <1>;
+			gpios = <&pio 25 0>;
 		};
 	};
-};
-
-&uart0 {
-	status = "okay";
-};
-
-&watchdog {
-	status = "okay";
 };
 
 &eth {
@@ -143,7 +133,7 @@
 &mdio_bus {
 	switch: switch@1f {
 		compatible = "mediatek,mt7531";
-		reg = <0x1f>;
+		reg = <31>;
 		reset-gpios = <&pio 39 GPIO_ACTIVE_HIGH>;
 		interrupt-controller;
 		#interrupt-cells = <1>;
@@ -167,13 +157,14 @@
                 label = "lan2";
         };
 
-        wan: port@2 {
-            reg = <2>;
+        port@2 {
+			reg = <2>;
 			label = "wan";
-        };
+		};
 
 		port@6 {
 			reg = <6>;
+			label = "cpu";
 			ethernet = <&gmac0>;
 			phy-mode = "2500base-x";
 
@@ -271,6 +262,14 @@
 			groups = "spi0", "spi0_wp_hold";
 		};
 	};
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&crypto {
+	status = "okay";
 };
 
 &usb_phy {
