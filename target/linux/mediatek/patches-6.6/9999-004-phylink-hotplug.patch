@@ -1,0 +1,35 @@
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -1629,6 +1629,8 @@
+ 	}
+ }
+ 
++extern void phy_hotplug_event(const char *ifname, const u32 status);
++
+ static void phylink_link_up(struct phylink *pl,
+ 			    struct phylink_link_state link_state)
+ {
+@@ -1675,8 +1677,10 @@
+ 				 pl->cur_interface, speed, duplex,
+ 				 !!(link_state.pause & MLO_PAUSE_TX), rx_pause);
+ 
+-	if (ndev)
++	if (ndev) {
+ 		netif_carrier_on(ndev);
++		phy_hotplug_event(ndev->name, 1);
++	}
+ 
+ 	phylink_info(pl,
+ 		     "Link is Up - %s/%s - flow control %s\n",
+@@ -1689,8 +1693,10 @@
+ {
+ 	struct net_device *ndev = pl->netdev;
+ 
+-	if (ndev)
++	if (ndev) {
+ 		netif_carrier_off(ndev);
++		phy_hotplug_event(ndev->name, 0);
++	}
+ 	pl->mac_ops->mac_link_down(pl->config, pl->act_link_an_mode,
+ 				   pl->cur_interface);
+ 	phylink_info(pl, "Link is Down\n");
